@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
+
+    <!--<route id="boxtal.config.save" path="/admin/module/BoxtalShipping/save" methods="POST">
+        <default key="_controller">BoxtalShipping\Controller\ConfigurationController::saveApiConfigAction</default>
+    </route>
+    <route id="boxtal.config.save_carriers1" path="/admin/module/BoxtalShipping/save_carriers" methods="POST">
+        <default key="_controller">BoxtalShipping\Controller\ConfigurationController::saveCarrierConfigAction</default>
+    </route>
+    <route id="boxtal.config.save_front_shipping" path="/admin/module/BoxtalShipping/save_front_shipping_method" methods="POST">
+        <default key="_controller">BoxtalShipping\Controller\ConfigurationController::saveFrontShippingMethodAction</default>
+    </route>
+
+    <route id="boxtal.bulk.orders" path="/admin/boxtalshipping/order">
+        <default key="_controller">BoxtalShipping\Controller\Admin\BoxtalOrderShipmentController::processBulkShipmentAction</default>
+    </route>
+        <route id="boxtal.order.ship" path="/admin/module/BoxtalShipping/ship">
+        <default key="_controller">BoxtalShipping\Controller\Admin\BoxtalOrderShipmentController::shipAction</default>
+    </route>
+    
+        <route id="boxtal.order.categories" path="/admin/module/BoxtalShipping/categories" methods="get">
+        <default key="_controller">BoxtalShipping\Controller\Admin\BoxtalOrderShipmentController::displayCategoriesAction</default>
+    </route>-->
+    <!--
+
+    if a /admin/module/boxtalshipping/ route is provided, a "Configuration" button will be displayed
+    for the module in the module list. Clicking this button will invoke this route.
+
+    <route id="my_route_id" path="/admin/module/boxtalshipping">
+        <default key="_controller">BoxtalShipping\Full\Class\Name\Of\YourConfigurationController::methodName</default>
+    </route>
+
+    <route id="my_route_id" path="/admin/module/boxtalshipping/route-name">
+        <default key="_controller">BoxtalShipping\Full\Class\Name\Of\YourAdminController::methodName</default>
+    </route>
+
+    <route id="my_route_id" path="/my/route/name">
+        <default key="_controller">BoxtalShipping\Full\Class\Name\Of\YourOtherController::methodName</default>
+    </route>
+
+    ...add as many routes as required.
+
+    <route>
+    ...
+    </route>
+    -->
+
+</routes>

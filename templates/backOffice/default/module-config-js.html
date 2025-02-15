@@ -1,0 +1,222 @@
+{javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+<script src='{$asset_url}'></script>
+{/javascripts}
+
+{javascripts file='assets/js/libs/underscore-min.js'}
+<script src="{$asset_url}"></script>
+{/javascripts}
+
+<script>
+
+var config = {
+    'urlAdd': '{url path="/admin/module/BoxtalShipping/slice/save"}',
+    'urlDelete': '{url path="/admin/module/BoxtalShipping/slice/delete"}',
+    'urlSave': '{url path="/admin/module/BoxtalShipping/slice/save"}'
+};
+
+    $(document).ready(function() {
+        var checkboxes = [];
+
+        //Buttons
+        $("#check-all-but").click( function() {
+            checkboxes.forEach(function(entry) {
+                $("#"+entry).prop('checked', true);
+            });
+        });
+        $("#uncheck-all-but").click( function() {
+            checkboxes.forEach(function(entry) {
+                $("#"+entry).prop('checked', false);
+            });
+        });
+        $("#reverse-all-but").click( function() {
+            checkboxes.forEach(function(entry) {
+                var box=$("#"+entry);
+                box.prop('checked', !box.is(":checked"));
+            });
+        });
+
+        // Free shipping switch
+        /*$(".freeshipping-activation-ColissimoPickupPoint").bootstrapSwitch();
+
+        $(".freeshipping-activation-ColissimoPickupPoint").on("switch-change", function(e, data){
+            var is_checked = data.value;
+            var mode = $(this).data("id");
+            var form = $("#freeshippingform");
+            $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
+            $.ajax({
+                url: form.attr('action'),
+                type: form.attr('method'),
+                data: form.serialize()
+            }).done(function(){
+                $("#loading-event").remove();
+            })
+                .success(function() {
+                    if (is_checked) {
+                        $('#config-btn-0').removeClass('disabled');
+                        $('#table-prices-colissimo-pickup-point-'+mode).hide('slow');
+                        $('#freeshipping-from-'+mode).hide('slow');
+                    } else {
+                        $('#config-btn-0').addClass('disabled');
+                        $('#table-prices-colissimo-pickup-point-'+mode).show('slow');
+                        $('#freeshipping-from-'+mode).show('slow');
+                    }
+                })
+                .fail(function(jqXHR, textStatus, errorThrown){
+                    $('#freeshipping-failed-body').html(jqXHR.responseJSON.error);
+                    $("#freeshipping-failed").modal("show");
+                });
+
+        });*/
+
+
+        // Price slice
+
+        var tpl = _.template($("#tpl-slice").html());
+
+        var showMessage = function showMessage(message) {
+            //$('#colissimo-pickup-point_dialog')
+            $('#boxtal-shipping_dialog')
+                    .find('.modal-body')
+                    .html(message)
+                    .end()
+                    .modal("show");
+        };
+
+        var getSliceData = function getSliceData($slice) {
+            var data = {
+                id: $slice.data("id") || 0,
+                area: $slice.data("area"),
+                deliveryModeId: $slice.data("delivmode"),
+                price: $slice.find(".js-slice-price").val(),
+                priceMax: $slice.find(".js-slice-price-max").val(),
+                weightMax: $slice.find(".js-slice-weight-max").val()
+            };
+            return data;
+        };
+
+        $('table').on('click', 'a.js-slice-add', function(e){
+            e.preventDefault();
+            var $slice = $(this).closest('tr.js-slice-new');
+            var data = getSliceData($slice);
+        
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                data: data,
+                url: config.urlAdd
+            }).done(function(response){
+                if (response.success) {
+                    var sliceHtml = tpl(response.slice);
+                    $(sliceHtml).insertBefore($slice);
+                    $slice.find('input').val(''); // Reset form
+                } else {
+                    showMessage(response.message.join('<br>'));
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown){
+                console.error('AJAX request failed:', textStatus, errorThrown);
+                showMessage(jqXHR.responseText);
+            });
+        });
+
+
+        // save new slice
+        $('.slices').on('click', '.js-slice-save', function(){
+            var $slice = $(this).parents('tr').first();
+            var data = getSliceData($slice);
+
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                data: data,
+                url: config.urlAdd
+            }).done(function(data, textStatus, jqXHR){
+                if (!data.success) {
+                    showMessage(data.message.join('<br>'));
+                } else {
+                    var sliceHtml = tpl(data.slice);
+                    $(sliceHtml).insertBefore($slice);
+                    $slice.remove();
+                    // $slice.find('.js-slice-save').removeClass('btn-success');
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown){
+                showMessage(jqXHR.responseText);
+            });
+        });
+
+        $('.slices').on('change', '.js-slice input', function() {
+            $(this).parents('tr').first().find('.js-slice-save').addClass('btn-success');
+        });
+
+        // delete new slice
+        $('.slices').on('click', '.js-slice-delete', function(){
+            var $slice = $(this).parents('tr').first();
+            var data = getSliceData($slice);
+
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                data: data,
+                url: config.urlDelete
+            }).done(function(data, textStatus, jqXHR){
+                var sliceHtml = '';
+                if (data.success) {
+                    $slice.remove();
+                } else {
+                    showMessage(data.message);
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown){
+                showMessage(jqXHR.responseText);
+            });
+        });
+
+        // add new slice
+        $('.js-slice input').on('change', function(){
+
+        });
+
+    });
+
+$(document).ready(function() {
+    var config = {
+        urlUpdate: '{url path="/admin/module/boxtalshipping/save_carrier_zone"}'
+    };
+
+    $('.js-carrier-checkbox').on('change', function() {
+        var $checkbox = $(this);
+        var areaId = $checkbox.data('area');
+        var carrierId = $checkbox.val();
+        var isChecked = $checkbox.prop('checked');
+
+        $.ajax({
+            url: config.urlUpdate,
+            method: 'POST',
+            data: JSON.stringify({
+                area_id: areaId,
+                carrier_id: carrierId,
+                action: isChecked ? 'add' : 'remove'
+            }),
+            contentType: 'application/json',
+            dataType: 'json'
+        })
+        .done(function(response) {
+            showFeedback(response.message, response.success ? 'success' : 'danger');
+        })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            showFeedback('Erreur: ' + errorThrown, 'danger');
+        });
+
+    });
+
+    function showFeedback(message, type) {
+        var $feedback = $('#ajax-feedback');
+        $feedback.removeClass('alert-success alert-danger')
+                 .addClass('alert-' + type)
+                 .html(message)
+                 .show();
+        
+        setTimeout(function() {
+            $feedback.hide();
+        }, 3000);
+    }
+});
+</script>

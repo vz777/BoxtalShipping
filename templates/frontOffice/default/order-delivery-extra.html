@@ -1,0 +1,116 @@
+<script type="text/html" id="boxtal_ui">
+    <td colspan="3">
+        <input type="hidden" name="boxtal-selected-delivery-type" value="none">
+        <div class="boxtal-home-delivery">
+            {loop type="boxtal.delivery.mode" name="home-delivery" country_id=$country}
+                {if $DELIVERY_TYPE == 'home'}
+                    <div class="delivery-option">
+                        <label for="delivery-method_{$module_id}_{$CARRIER_CODE}">
+                            {form name="thelia.order.delivery"}
+                                {form_field field='delivery-module'}
+                                    <input type="radio" data-boxtal-delivery-type="{$CARRIER_CODE}" name="{$name}" id="delivery-method_{$module_id}_{$CARRIER_CODE}" value="{$module_id}">
+                                    <strong>{intl l="Home delivery with" d="boxtalshipping.fo.default"} {$TITLE}</strong>
+                                {/form_field}
+                            {/form}
+                        </label>
+                        <span class="price">
+                            {format_money number=$PRICE symbol={currency attr='symbol'}}
+                        </span>
+                    </div>
+                {/if}
+            {/loop}
+        </div>
+
+        <div class="boxtal-relay-delivery">
+            {loop type="boxtal.delivery.mode" name="relay-delivery" country_id=$country}
+                {if $DELIVERY_TYPE == 'relay'}
+                    <div class="delivery-option">
+                        <label for="delivery-method_{$module_id}_{$CARRIER_CODE}">
+                            {form name="thelia.order.delivery"}
+                                {form_field field='delivery-module'}
+                                            <input type="radio" data-boxtal-delivery-type="{$CARRIER_CODE}" data-type="relay" data-carrier="{$CARRIER_CODE}" name="{$name}" id="delivery-method_{$module_id}_{$CARRIER_CODE}" value="{$module_id}">
+                                            <input type="hidden" name="selected_carrier_code" value="">
+                                {/form_field}
+                            {/form}
+                        </label>
+                        <span class="price">
+                            {format_money number=$PRICE symbol={currency attr='symbol'}}
+                        </span>
+                    </div>
+
+                    <div id="boxtal-relay-list-{$CARRIER_CODE}" class="boxtal-relay-list" style="display:none;">
+                    {loop type="address" name="delivery-address" id={order attr="delivery_address"}}
+                        {loop type="boxtal.relay.points" name="boxtal_points" carrier_code=$CARRIER_CODE country_id=$country zipcode=$ZIPCODE city=$CITY}{$address}
+                            <label>{$CARRIER_CODE}
+                                <input type="radio" name="boxtal_selected_pickup_point" value="{$RELAY_CODE}">
+                                <strong>{$NAME} - {$RELAY_CODE}</strong>, {$STREET}, {$ZIPCODE|default:null} {$CITY}
+                                Distance: {$DISTANCE}
+                                <input type="hidden" name="relay_name[{$RELAY_CODE}]" value="{$NAME}">
+                                <input type="hidden" name="relay_street[{$RELAY_CODE}]" value="{$STREET}">
+                                <input type="hidden" name="relay_zipcode[{$RELAY_CODE}]" value="{$ZIPCODE}">
+                                <input type="hidden" name="relay_city[{$RELAY_CODE}]" value="{$CITY}">
+                                <input type="hidden" name="relay_country[{$RELAY_CODE}]" value="{$COUNTRY}">
+                                <input type="hidden" name="relay_distance[{$RELAY_CODE}]" value="{$DISTANCE}">
+                            </label><br>
+                        {/loop}
+                    {/loop}   
+                    </div>
+                {/if}
+            {/loop}
+        </div>
+    </td>
+</script>
+
+<script>
+// changement de type de livraison
+$(document).ready(function () {
+    $(document).on('change', '[data-boxtal-delivery-type]', function () {
+        var selectedCarrierCode = $(this).data('boxtal-delivery-type');
+
+        $('.boxtal-relay-list').hide();
+
+        $('#boxtal-relay-list-' + selectedCarrierCode).slideDown();
+    });
+
+    var initiallySelected = $('[data-boxtal-delivery-type]:checked').data('boxtal-delivery-type');
+    if (initiallySelected) {
+        $('#boxtal-relay-list-' + initiallySelected).show();
+    }
+});
+
+$(document).ready(function() {
+    $("#delivery-module-{$module_id}").html($('#boxtal_ui').html());
+
+$(document).on('change', '[data-boxtal-delivery-type]', function() {
+    var selectedType = $(this).data('boxtal-delivery-type');
+    $('input[name=boxtal-selected-delivery-type]').val(selectedType);
+    $('#selected_delivery_type').val(selectedType);
+
+    var isRelay = $(this).data('type') === 'relay';
+
+    if (isRelay) {
+        $('#boxtal-relay-list').slideDown();
+    } else {
+        $('#boxtal-relay-list').slideUp();
+    }
+});
+        
+// Gestion des points relais
+$(document).on('change', 'input[name="boxtal_selected_pickup_point"]', function() {
+    var selectedRelayCode = $(this).val();
+    var selectedCarrierCode = $('input[data-boxtal-delivery-type]:checked').data('boxtal-delivery-type');
+    var selectedRelayName = $('input[name="relay_name[' + selectedRelayCode + ']"]').val();
+    var selectedRelayStreet = $('input[name="relay_street[' + selectedRelayCode + ']"]').val();
+    var selectedRelayZipcode = $('input[name="relay_zipcode[' + selectedRelayCode + ']"]').val();
+    var selectedRelayCity = $('input[name="relay_city[' + selectedRelayCode + ']"]').val();
+    var selectedRelayCountry = $('input[name="relay_country[' + selectedRelayCode + ']"]').val();
+
+    $('input[name="selected_relay_code"]').val(selectedRelayCode);
+    $('input[name="selected_carrier_code"]').val(selectedCarrierCode);
+    $('input[name="selected_relay_name"]').val(selectedRelayName);
+    $('input[name="selected_relay_address"]').val(selectedRelayStreet + ', ' + selectedRelayZipcode + ' ' + selectedRelayCity);
+});
+
+$('[data-boxtal-delivery-type]:checked').trigger('change');
+});
+</script>

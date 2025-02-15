@@ -1,0 +1,31 @@
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+{literal}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var map = L.map('boxtal-pickup-map').setView([46.603354, 1.888334], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    function loadParcelPoints() {
+        var city = document.getElementById('city').value;
+        var postalCode = document.getElementById('zipcode').value;
+
+        fetch(`/module/BoxtalShipping/parcel-points?city=${city}&postalCode=${postalCode}`)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(point => {
+                    var marker = L.marker([point.latitude, point.longitude]).addTo(map);
+                    marker.bindPopup(`<b>${point.name}</b><br>${point.address}<br><button onclick="selectPoint('${point.id}')">Choisir</button>`);
+                });
+                map.fitBounds(L.featureGroup(markers).getBounds());
+            });
+    }
+
+    function selectPoint(pointId) {
+        document.getElementById('selected-pickup-point').value = pointId;
+    }
+
+    document.getElementById('zipcode').addEventListener('change', loadParcelPoints);
+});
+</script>
+{/literal}

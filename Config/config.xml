@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <loops>
+        <loop name="boxtal.relay.points" class="BoxtalShipping\Loop\BoxtalGetRelais" />
+        <loop name="boxtal.prices" class="BoxtalShipping\Loop\BoxtalShippingPrice" />
+        <loop name="boxtal.delivery.address" class="BoxtalShipping\Loop\BoxtalDeliveryAddress" />
+        <loop name="boxtal.delivery.mode" class="BoxtalShipping\Loop\BoxtalDeliveryMode" />
+        <loop name="boxtal.active.delivery.modes" class="BoxtalShipping\Loop\BoxtalActiveDeliveryModes" />
+        <loop name="boxtal.carrier.zone" class="BoxtalShipping\Loop\BoxtalCarrierZoneLoop" />
+    </loops>
+
+    <forms>
+        <form name="boxtal_shipment_form" class="BoxtalShipping\Form\ShipmentForm" />
+        <form name="boxtal_export_pricing" class="BoxtalShipping\Form\ExportPricing" />
+        <form name="boxtalshipping_carrier_configuration" class="BoxtalShipping\Form\ConfigurationForm" />
+        <form name="boxtal_export_pricing" class="BoxtalShipping\Form\CarrierZoneForm" />
+        <form name="boxtal_export_pricing" class="BoxtalShipping\Form\CarrierConfigurationForm" />
+    </forms>
+
+    <services>
+        <service id="boxtal.shipping.service" class="BoxtalShipping\Service\BoxtalShippingService"></service>
+        <service id="boxtal.shipment.form" class="BoxtalShipping\Form\ShipmentForm"></service>
+        <service id="boxtal.pricing.service" class="BoxtalShipping\Service\BoxtalPricingService"></service>
+        <service id="boxtal.api.token.service" class="BoxtalShipping\Service\BoxtalApiTokenService"></service>
+        <service id="boxtal.relais.service" class="BoxtalShipping\Service\BoxtalRelaisService"></service>
+    </services>
+
+    <hooks>
+        <hook id="boxtal.pickup.point.hook.back" class="BoxtalShipping\Hook\BackHook">
+            <argument type="service" id="boxtal.pricing.service" />
+            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfiguration" />
+            <tag name="hook.event_listener" event="module.config-js" type="back" method="onModuleConfigJs" />
+            <tag name="hook.event_listener" event="order-edit.bill-delivery-address" type="back" templates="render:boxtalshipping/order-edit-delivery-address.html" />
+            <tag name="hook.event_listener" event="boxtal.pricing.display" type="back" method="onBoxtalPricingDisplay" />
+            <tag name="hook.event_listener" event="main.top-menu-tools" type="back" method="onMainTopMenuTools" />
+        </hook>
+
+        <hook id="boxtalshipping.front.hook.test" class="BoxtalShipping\Hook\FrontHook" scope="request">
+            <argument type="service" id="boxtal.relais.service" />
+            <argument type="service" id="request_stack" />    
+            <tag name="hook.event_listener" event="order-delivery.extra" type="front" method="onOrderDeliveryExtra"/>
+            <tag name="hook.event_listener" event="order-invoice.delivery-address" type="front" templates="render:boxtalshipping/delivery-address.html"/>
+        </hook>
+
+        <hook id="boxtalshipping.email.hookmanager" class="Boxtalshipping\Hook\EmailHook">
+            <tag name="hook.event_listener" event="email-html.order-confirmation.delivery-address" type="email" method="onDeliveryAddressHtml"/>
+            <tag name="hook.event_listener" event="email-txt.order-confirmation.delivery-address" type="email" method="onDeliveryAddressText"/>
+            <tag name="hook.event_listener" event="email-html.order-notification.delivery-address" type="email" method="onDeliveryAddressHtml"/>
+            <tag name="hook.event_listener" event="email-txt.order-notification.delivery-address" type="email" method="onDeliveryAddressText"/>
+        </hook>
+    </hooks>
+</config>

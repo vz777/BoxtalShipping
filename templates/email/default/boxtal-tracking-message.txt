@@ -1,0 +1,32 @@
+{$d='boxtalshipping.email.default'}
+{default_locale locale={$locale}}
+
+{loop type="order" name="order" customer='*' id=$order_id}
+    {loop type="customer" name="customer.order" current=false id=$CUSTOMER backend_context="1"}
+        {intl d=$d l="Dear %first %last" last=$LASTNAME first=$FIRSTNAME},<br>
+    {/loop}
+
+    {$locale = 'FR'}
+    {loop type="lang" name="lang" id=$LANG limit=1}
+        {$locale = $LOCALE|substr:0:2|upper}
+    {/loop}
+
+    {loop type="boxtal.delivery.address" name="boxtal_delivery" order_id=$ID}
+        {$carrier_code = $CARRIER_CODE}
+    {/loop}
+
+    {if $carrier_code == 'MONR'}
+        {$tracking_url = "https://www.mondialrelay.fr/suivi-de-colis"}
+    {elseif $carrier_code == 'CHRP'}
+        {$tracking_url = "https://www.chronopost.fr/tracking-no-cms/suivi-page"}
+    {elseif $carrier_code == 'UPSE'}
+        {$tracking_url = "https://www.ups.com/track?loc=fr_FR&tracknum="}
+    {else}
+        {$tracking_url = "#"}
+    {/if}
+
+    {intl d=$d l="Your order %order_ref has just been shipped from our store. The tracking number for this order is %tracking_ref. Tracking data is available at this address: %tracking_url" tracking_ref=$DELIVERY_REF order_ref=$REF tracking_url=$tracking_url}<br>
+    {intl d=$d l="Details about this order are available in your customer account: %account_url." account_url={url path="/account"}}<br>
+    {intl d=$d l="See you soon at %store at the following address: %url" url={navigate to='index'} store={config key="store_name"}}<br>
+    {intl d=$d l="The %store team." store={config key="store_name"}}
+{/loop}

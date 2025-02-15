@@ -1,0 +1,110 @@
+<style>
+    .table-responsive {
+        width: 100%;
+        overflow-x: scroll;
+        -webkit-overflow-scrolling: touch;
+    }
+    .table-responsive table {
+        width: 200%;
+        max-width: none;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">{intl l='Shipping Rates' d='boxtalshipping.bo.default'}</h3>
+                </div>
+                
+                <div class="box-body table-responsive">
+                    {if $pricing_data}
+                        {$data = json_decode($pricing_data, true)}
+                        
+                        {assign var="weights" value=[]}
+                        {for $i=1 to 30}
+                            {$weights[] = $i}
+                        {/for}
+                        {$services = []}
+                        
+                        {* Collect all services *}
+                        {foreach from=$data item=operator}
+                            {foreach from=$operator key=service item=prices}
+                                {$services[] = $service}
+                            {/foreach}
+                        {/foreach}
+                        
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>{intl l='Weight (kg)' d='boxtalshipping.bo.default'}</th>
+                                    {foreach from=$services item=service}
+                                        <th>{$service}</th>
+                                    {/foreach}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {foreach from=$weights item=weight}
+                                    <tr>
+                                        <td>{$weight}</td>
+                                        {foreach from=$services item=service}
+                                            <td>
+                                                {foreach from=$data item=operator}
+                                                    {if isset($operator[$service][$weight])}
+                                                        {$operator[$service][$weight]|number_format:2} €
+                                                    {/if}
+                                                {/foreach}
+                                            </td>
+                                        {/foreach}
+                                    </tr>
+                                {/foreach}
+                            </tbody>
+                        </table>
+                    {else}
+                        <div class="alert alert-warning">
+                            {intl l='No pricing data available' d='boxtalshipping.bo.default'}
+                        </div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br/><br/>
+
+{if $pricing_data}
+{foreach from=json_decode($pricing_data, true) key=operator item=services}
+    <div class="card mb-3">
+        <div class="card-header bg-primary text-white">
+            <h4>{$operator}</h4>
+        </div>
+        <div class="card-body">
+            {foreach from=$services key=service item=weights}
+                <h5>{$service}</h5>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>{intl l='Weight (kg)' d='boxtalshipping.bo.default'}</th>
+                            <th>{intl l='Price (€)' d='boxtalshipping.bo.default'}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {foreach from=$weights key=weight item=price}
+                            <tr>
+                                <td>{$weight}</td>
+                                <td>{$price|number_format:2} €</td>
+                            </tr>
+                        {/foreach}
+                    </tbody>
+                </table>
+            {/foreach}
+        </div>
+    </div>
+{/foreach}
+{else}
+    <div class="alert alert-warning">
+        {intl l='No pricing data available' d='boxtalshipping.bo.default'}
+    </div>
+{/if}

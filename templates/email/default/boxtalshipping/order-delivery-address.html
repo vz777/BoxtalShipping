@@ -1,0 +1,15 @@
+{strip}
+{ifloop rel="avec-pickup"}
+    {loop type="boxtal.delivery.address" name="avec-pickup" order_id=$order_id}
+        {intl l="Pickup location #%num" num=$ID d="boxtalshipping.email.default"}<br>
+            <p>{intl l="Carrier code" d="boxtalshipping.email.default"} : {$CARRIER_CODE}</p>
+            {$COMPANY}<br>
+            {$ADDRESS1}<br>
+            {if $ADDRESS2}{$ADDRESS2}<br>{/if}
+            {if $ADDRESS3}{$ADDRESS3}<br>{/if}
+            {$ZIPCODE} {$CITY}<br>
+    {/loop}
+{/ifloop}
+{elseloop rel="avec-pickup"}
+{/elseloop}
+{/strip}

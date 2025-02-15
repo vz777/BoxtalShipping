@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database defaultIdMethod="native" name="TheliaMain" namespace="BoxtalShipping\Model"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../../vendor/thelia/propel/resources/xsd/database.xsd" >
+    <!--
+    See propel documentation on http://propelorm.org for all information about schema file
+
+    <table name="product_rel" namespace="BoxtalShipping\Model">
+        <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+        <column defaultValue="0" name="visible" required="true" type="TINYINT" />
+        <column defaultValue="0" name="position" required="true" type="INTEGER" />
+        <column name="title" size="255" type="VARCHAR" />
+        <column name="description" type="CLOB" />
+        <column name="chapo" type="LONGVARCHAR" />
+        <column name="postscriptum" type="LONGVARCHAR" />
+        <foreign-key foreignTable="product" name="fk_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
+            <reference foreign="id" local="product_id" />
+        </foreign-key>
+        <behavior name="timestampable" />
+        <behavior name="i18n">
+            <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+        </behavior>
+    </table>
+    -->
+
+	<table name="boxtal_order_address">
+        <column name="id" primaryKey="true" required="true" type="INTEGER" />
+        <column name="code" size="10" type="VARCHAR" required="true" />
+        <foreign-key foreignTable="order_address" name="fk_order_address_boxtal_order_address_id" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference foreign="id" local="id" />
+        </foreign-key>
+    </table>
+
+    <table name="boxtal_address">
+    	<column name="id" primaryKey="true" required="true" type="INTEGER" autoIncrement="true" />
+	    <column name="company" size="255" type="VARCHAR" required="true"/>
+	    <column name="address1" required="true" size="255" type="VARCHAR" />
+	    <column name="address2" size="255" type="VARCHAR" />
+	    <column name="address3" size="255" type="VARCHAR" />
+	    <column name="zipcode" required="true" size="10" type="VARCHAR" />
+	    <column name="city" required="true" size="255" type="VARCHAR" />
+    	<column name="country_id" required="true" type="INTEGER" />
+    	<column name="relay_code" required="true" size="10" type="VARCHAR" />
+        <column name="delivery_mode_id" type="INTEGER" required="true" />
+	    <foreign-key foreignTable="country" name="fk_address_boxtal_country_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+	      <reference foreign="id" local="country_id" />
+	    </foreign-key>
+	    <foreign-key foreignTable="boxtal_delivery_mode" name="fk_address_boxtal_delivery_mode_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+            <reference foreign="id" local="delivery_mode_id" />
+        </foreign-key>
+    </table>
+    
+    <table name="boxtal_delivery_mode">
+        <column name="id" primaryKey="true" autoIncrement="true" required="true" type="INTEGER" />
+        <column name="title" size="255" type="VARCHAR"/>
+        <column name="carrier_code" size="55" type="VARCHAR" required="true"/>
+        <column name="delivery_type" type="VARCHAR" size="10" required="true"/>
+        <column name="is_active" type="BOOLEAN" default="true"/>
+        <column name="freeshipping_active" type="BOOLEAN"/>
+        <column name="freeshipping_from" type="FLOAT"/>
+    </table>
+    
+    <table name="boxtal_freeshipping">
+        <column name="id" primaryKey="true" autoIncrement="true" required="true" type="INTEGER" />
+        <column name="area_id" required="true" type="INTEGER" />
+        <column name="delivery_mode_id" required="true" type="INTEGER" />
+        <column name="active" required="true" type="BOOLEAN" />
+        <foreign-key foreignTable="area" name="fk_boxtal_freeshipping_area_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+            <reference foreign="id" local="area_id" />
+        </foreign-key>
+        <foreign-key foreignTable="boxtal_delivery_mode" name="fk_boxtal_freeshipping_delivery_mode_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+            <reference foreign="id" local="delivery_mode_id" />
+        </foreign-key>
+        <behavior name="timestampable" />
+    </table>
+
+    <table name="boxtal_price">
+        <column name="id" primaryKey="true" autoIncrement="true" required="true" type="INTEGER" />
+        <column name="area_id" required="true" type="INTEGER" />
+        <column name="delivery_mode_id" required="true" type="INTEGER" />
+        <column name="weight_max" required="true" type="FLOAT" />
+        <column name="price_max" type="FLOAT" />
+        <column name="franco_min_price" type="FLOAT" />
+        <column name="price" required="true" type="FLOAT" />
+        <behavior name="timestampable" />
+        <foreign-key foreignTable="area" name="fk_boxtal_price_area_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+            <reference foreign="id" local="area_id" />
+        </foreign-key>
+            <foreign-key foreignTable="boxtal_delivery_mode" name="fk_boxtal_price_delivery_mode_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+            <reference foreign="id" local="delivery_mode_id" />
+        </foreign-key>
+    </table>
+    
+    <table name="boxtal_carrier_zone">
+        <column name="id" primaryKey="true" required="true" autoIncrement="true" type="INTEGER" />
+        <column name="delivery_mode_id" required="true" type="INTEGER" />
+        <column name="area_id" required="true" type="INTEGER" />
+        <foreign-key foreignTable="boxtal_delivery_mode" name="fk_boxtal_carrier_zone_delivery_mode_id" onDelete="CASCADE">
+            <reference local="delivery_mode_id" foreign="id" />
+        </foreign-key>
+
+        <foreign-key foreignTable="area" name="fk_boxtal_carrier_zone_area_id" onDelete="CASCADE">
+            <reference local="area_id" foreign="id" />
+        </foreign-key>
+
+        <unique>
+            <unique-column name="delivery_mode_id"/>
+            <unique-column name="area_id"/>
+        </unique>
+    </table>
+
+	<external-schema filename="local/config/schema.xml" referenceOnly="true" />
+</database>

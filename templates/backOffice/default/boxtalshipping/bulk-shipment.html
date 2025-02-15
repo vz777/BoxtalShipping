@@ -1,0 +1,275 @@
+{extends file="admin-layout.tpl"}
+{block name="main-content"}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{intl l="Expéditions Boxtal" d='boxtalshipping.bo.default'}</h3>
+                </div>
+                {if isset($results)}
+                    <div class="results-container">
+                        {foreach $results as $result}
+                            <div class="alert {if $result.success}alert-success{else}alert-danger{/if}">
+                                <p>{$result.message}</p>
+                                {if $result.success && isset($result.shipmentInfo)}
+                                    <ul>
+                                        <li>Order number: {$result.shipmentInfo.id}</li>
+                                        <li>Shipment ID: {$result.shipmentInfo.shipmentId}</li>
+                                        <li>Status: {$result.shipmentInfo.status}</li>
+                                        <li>Delivery Price: {$result.shipmentInfo.deliveryPrice} {$result.shipmentInfo.currency}</li>
+                                        <li>Expected Taking Over Date: {$result.shipmentInfo.expectedTakingOverDate}</li>
+                                        <li>Estimated Delivery Date: {$result.shipmentInfo.estimatedDeliveryDate}</li>
+                                    </ul>
+                                {/if}
+                            </div>
+                        {/foreach}
+                    </div>
+                {/if}
+
+                {form name="boxtal_shipment_form"}
+
+                <form method="POST" action="{url path='/admin/boxtalshipping/order'}">
+                {form_hidden_fields form=$form}
+
+                {if $form_error}
+                    <div class="alert alert-danger">{$form_error_message}</div>
+                {/if}
+
+                <div class="card-body">
+                    <p>{intl l="You don't have to change the content type if you've defined a default category." d='boxtalshipping.bo.default'}
+
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="select-all">
+                                </th>
+                                    <th>{intl l="Customer" d="boxtalshipping.bo.default"}</th>
+                                    <th>{intl l="Total incl. tax" d="boxtalshipping.bo.default"}</th>
+                                    <th>{intl l="Shipping method" d="boxtalshipping.bo.default"}</th>
+                                    <th>{intl l="Length *" d="boxtalshipping.bo.default"}</th>
+                                    <th>{intl l="Width *" d="boxtalshipping.bo.default"}</th>
+                                    <th>{intl l="Height *" d="boxtalshipping.bo.default"}</th>
+                                    <th>{intl l="Weight *" d="boxtalshipping.bo.default"}</th>
+                                    <th>{intl l="Relay code" d="boxtalshipping.bo.default"}</th>
+                                    <th>{intl l="Insurance" d="boxtalshipping.bo.default"}</th>
+                                    <th>
+                                        {intl l="Content type" d="boxtalshipping.bo.default"}
+                                        <small>({intl l="leave empty if default category selected" d="boxtalshipping.bo.default"})</small>
+                                    </th>
+                                    <th>{intl l="Address type" d="boxtalshipping.bo.default"}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loop type="order" name="paid_orders" backend_context="true" customer="*" status="2"}
+                            {assign var="relayCode" value=""} 
+                                {loop name="boxtal_delivery_address" type="boxtal.delivery.address" order_id=$ID}
+                                {$lastName={$LASTNAME}}
+                                <div class="boxtal-delivery-address">
+                                    <h3>{$COMPANY}</h3>    <p>{$ADDRESS1}</p>    {if $ADDRESS2}<p>{$ADDRESS2}</p>{/if}    {if $ADDRESS3}<p>{$ADDRESS3}</p>{/if}
+                                    <p>{$ZIPCODE} {$CITY}</p>    <p>Point Relais Code: {$relayCode={$RELAY_CODE}}</p>    {if $DELIVERY_MODE_TITLE}
+                                    <h4>Mode de livraison : {$DELIVERY_MODE_TITLE}</h4>    <p>Type de livraison : {$DELIVERY_TYPE}</p>
+                                    <p>Code transporteur : {$CARRIER_CODE}</p>    {if $FREESHIPPING_ACTIVE}    <p>Livraison gratuite à partir de : {$FREESHIPPING_FROM}</p>    {/if}    {/if}</div>
+                                {/loop}
+                                <tr>
+                                    <td>
+                                        {form_field form=$form field='order_ids'}
+                                            <input type="checkbox" name="{$name}[]" value="{$ID|default:null}" id="{$name}_{$ID|default:null}" class="order-checkbox">
+                                            <label for="{$name}_{$ID|default:null}">{$ID}</label>
+                                            {form_error form=$form field="order_ids"}
+                                                <br />
+                                                <span class="error">{$message|default:null}</span>
+                                            {/form_error}
+                                        {/form_field}
+                                    </td>
+                                    <td>
+                                    {$lastName|default:null}
+                                    </td>
+                                    <td>{$TOTAL_AMOUNT|number_format:2} €</td>
+                                    <td>
+                                        {form_field form=$form field="shipping_method_{$ID|default:null}"}
+<select name="{$name}" id="{$name}" class="form-control field-shipping-method">
+    <option value="">{intl l="Choose a shipping method" d="boxtalshipping.bo.default"}</option>
+    {foreach $choices as $choice}
+        <option value="{$choice->value}">{$choice->label}</option>
+    {/foreach}
+</select>
+                                            {form_error form=$form field="shipping_method_{$ID|default:null}"}
+                                                <br />
+                                                <span class="error">{$message|default:null}</span>
+                                            {/form_error}
+                                        {/form_field}
+                                    </td>
+                                    <td>
+                                        {form_field form=$form field="length_{$ID|default:null}"}
+                                            <input type="number" name="{$name}" id="{$name}" class="form-control field-length" step="0.01" min="0" placeholder={intl l="Length" d="boxtalshipping.bo.default"}>
+                                            {form_error form=$form field="length_{$ID|default:null}"}
+                                                <br />
+                                                <span class="error">{$message|default:null}</span>
+                                            {/form_error}
+                                        {/form_field}
+                                    </td>
+                                    <td>
+                                        {form_field form=$form field="width_{$ID|default:null}"}
+                                            <input type="number" name="{$name}" id="{$name}" class="form-control field-width" step="0.01" min="0" placeholder={intl l="Width" d="boxtalshipping.bo.default"}>
+                                            {form_error form=$form field="width_{$ID|default:null}"}
+                                                <br />
+                                                <span class="error">{$message|default:null}</span>
+                                            {/form_error}
+                                        {/form_field}
+                                    </td>
+                                    <td>
+                                        {form_field form=$form field="height_{$ID|default:null}"}
+                                            <input type="number" name="{$name}" id="{$name}" class="form-control field-height" step="0.01" min="0" placeholder={intl l="Height" d="boxtalshipping.bo.default"}>
+                                            {form_error form=$form field="height_{$ID|default:null}"}
+                                                <br />
+                                                <span class="error">{$message|default:null}</span>
+                                            {/form_error}
+                                        {/form_field}
+                                    </td>
+                                    <td>
+                                        {form_field form=$form field="weight_{$ID|default:null}"}
+                                            <input type="number" name="{$name}" id="{$name}" class="form-control field-weight" step="0.01" min="0" placeholder={intl l="Weight" d="boxtalshipping.bo.default"}>
+                                            {form_error form=$form field="weight_{$ID|default:null}"}
+                                                <br />
+                                                <span class="error">{$message|default:null}</span>
+                                            {/form_error}
+                                        {/form_field}
+                                    </td>
+                                    <td>
+                                        {form_field form=$form field="relay_point_{$ID|default:null}"}{$relayCode|default:null}
+                                            <input type="text" name="{$name}" id="{$name}" class="form-control"
+                                            value="{$relayCode|default:null}" placeholder="{intl l='Enter relay code' d="boxtalshipping.bo.default"}">
+                                            {form_error form=$form field="relay_point_{$ID|default:null}"}
+                                                <br />
+                                                <span class="error">{$message|default:null}</span>
+                                            {/form_error}
+                                        {/form_field}
+                                    </td>
+                                    <td>
+                                        {form_field form=$form field="insured_{$ID|default:null}"}
+                                            <input type="checkbox" name="{$name}" id="{$name}" class="form-control">
+                                            {form_error form=$form field="insured_{$ID|default:null}"}
+                                                <br />
+                                                <span class="error">{$message|default:null}</span>
+                                            {/form_error}
+                                        {/form_field}
+                                    </td>
+                                    <td>
+{form_field form=$form field="content_description_{$ID|default:null}"}
+    <select name="{$name}" id="{$name}" class="form-control">
+        <option value="">{intl l="Choose a content category" d="boxtalshipping.bo.default"}</option>
+        {foreach $choices as $choice}
+            <option value="{$choice->value}">{$choice->label}</option>
+        {/foreach}
+    </select>
+    {form_error form=$form field="content_description_{$ID|default:null}"}
+        <br />
+        <span class="error">{$message|default:null}</span>
+    {/form_error}
+{/form_field}
+</td>
+<td>
+{form_field form=$form field="address_type_{$ID|default:null}"}
+    <select name="{$name}" id="{$name}" class="form-control">
+        <option value="RESIDENTIAL">{intl l="Residential" d="boxtalshipping.bo.default"}</option>
+        <option value="BUSINESS">{intl l="Business" d="boxtalshipping.bo.default"}</option>
+    </select>
+    {form_error form=$form field="address_type_{$ID|default:null}"}
+        <br />
+        <span class="error">{$message|default:null}</span>
+    {/form_error}
+{/form_field}
+</td>
+
+                            {/loop}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-shipping-fast"></i>{intl l="Ship with Boxtal" d="boxtalshipping.bo.default"}
+                    </button>
+                </div>
+
+                </form>
+                {/form}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Select all
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAllCheckbox = document.getElementById('select-all');
+    const orderCheckboxes = document.querySelectorAll('.order-checkbox');
+    selectAllCheckbox.addEventListener('change', function() {
+        orderCheckboxes.forEach(checkbox => {
+            checkbox.checked = selectAllCheckbox.checked;
+        });
+    });
+});
+// Checks the order checkbox if any field in the row is filled
+document.addEventListener('DOMContentLoaded', function() {
+    const orderRows = document.querySelectorAll('tr');
+
+    orderRows.forEach(row => {
+        const checkbox = row.querySelector('.order-checkbox');
+        const inputs = row.querySelectorAll('input:not([type="checkbox"]), select');
+
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+
+                if (this.value !== '') {
+                    checkbox.checked = true;
+                } else {
+                    const anyFilled = Array.from(inputs).some(inp => inp.value !== '');
+                    if (!anyFilled) {
+                        checkbox.checked = false;
+                    }
+                }
+            });
+        });
+    });
+});
+// Makes dimension fields and shipping method required if any of them is filled
+document.addEventListener('DOMContentLoaded', function () {
+    const rows = document.querySelectorAll('tr');
+
+    rows.forEach(row => {
+        const shippingMethod = row.querySelector('.field-shipping-method');
+        const length = row.querySelector('.field-length');
+        const width = row.querySelector('.field-width');
+        const height = row.querySelector('.field-height');
+        const weight = row.querySelector('.field-weight');
+
+        const fields = [shippingMethod, length, width, height, weight];
+
+        if (fields.every(field => field !== null)) {
+            fields.forEach(field => {
+                field.addEventListener('input', function () {
+                    if (isAnyFieldFilled(fields)) {
+                        fields.forEach(otherField => {
+                            otherField.setAttribute('required', 'required');
+                        });
+                    } else {
+                        fields.forEach(otherField => {
+                            otherField.removeAttribute('required');
+                        });
+                    }
+                });
+            });
+        }
+    });
+
+    function isAnyFieldFilled(fields) {
+        return fields.some(field => field.value.trim() !== '');
+    }
+});
+
+</script>
+
+{/block}

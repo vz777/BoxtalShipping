@@ -1,0 +1,18 @@
+{loop name="boxtal_delivery_address" type="boxtal.delivery.address" id={order attr="delivery_module"}}
+<div class="boxtal-delivery-address">
+    <h3>{$COMPANY}</h3>
+    <p>{$ADDRESS1}</p>
+    {if $ADDRESS2}<p>{$ADDRESS2}</p>{/if}
+    {if $ADDRESS3}<p>{$ADDRESS3}</p>{/if}
+    <p>{$ZIPCODE} {$CITY}</p>
+    <p>Point Relais Code: {$RELAY_CODE}</p>
+    {if $DELIVERY_MODE_TITLE}
+    <h4>Mode de livraison : {$DELIVERY_MODE_TITLE}</h4>
+    <p>Type de livraison : {$DELIVERY_TYPE}</p>
+    <p>Code transporteur : {$CARRIER_CODE}</p>
+    {if $FREESHIPPING_ACTIVE}
+    <p>Livraison gratuite à partir de : {$FREESHIPPING_FROM}</p>
+    {/if}
+    {/if}
+</div>
+{/loop}

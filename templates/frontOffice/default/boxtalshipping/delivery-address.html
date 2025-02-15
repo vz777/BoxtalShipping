@@ -1,0 +1,31 @@
+{strip}
+{loop name="boxtal_delivery_address" type="boxtal.delivery.address" id={order attr="delivery_module"} code="BoxtalShipping"}
+    <div class="panel panel-default col-sm-6">
+        <div class="panel-heading">{intl l="Pickup location address" d="boxtalshipping.fo.default"}</div>
+        <div class="panel-body">
+            <span class="fn">{intl l="Pickup location #%number" number=$ID d="boxtalshipping.fo.default"}</span>
+            <span class="org">{$COMPANY}</span>
+            <address class="adr">
+                <span class="street-address">{$ADDRESS1}</span><br>
+                {if $ADDRESS2}<span class="street-address">{$ADDRESS2}</span><br>{/if}
+                {if $ADDRESS3}<span class="street-address">{$ADDRESS3}</span><br>{/if}
+                <span class="postal-code">{$ZIPCODE} </span>
+                <span class="locality">{$CITY}</span>
+            </address>
+            
+            {if $DELIVERY_MODE_TITLE}
+                <div class="delivery-info">
+                    <h4>{intl l="Delivery mode" d="boxtalshipping.fo.default"} : {$DELIVERY_MODE_TITLE}</h4>
+                    <p>{intl l="Delivery type" d="boxtalshipping.fo.default"} : {$DELIVERY_TYPE}</p>
+                    <p>{intl l="Carrier code" d="boxtalshipping.fo.default"} : {$CARRIER_CODE}</p>
+                    
+                    {if $RELAY_CODE}<p>{intl l="Relay Point Code" d="boxtalshipping.fo.default"}: {$RELAY_CODE}</p>{/if}
+                    {if $FREESHIPPING_ACTIVE}
+                        <p>{intl l="Free shipping from" d="boxtalshipping.fo.default"} : {$FREESHIPPING_FROM}</p>
+                    {/if}
+                </div>
+            {/if}
+        </div>
+    </div>
+{/loop}
+{/strip}

@@ -1,0 +1,123 @@
+
+
+    Informations sur le colis :
+
+    ['shipment']['package']['weight']
+    ['shipment']['package']['length']
+    ['shipment']['package']['width']
+    ['shipment']['package']['height']
+    ['shipment']['package']['quantity']
+
+Contenu et délai :
+
+    ['shipment']['content']
+    ['shipment']['delay']
+
+Informations sur l'expéditeur :
+
+    ['shipment']['shipper']['type']
+    ['shipment']['shipper']['country']
+    ['shipment']['shipper']['zipcode']
+    ['shipment']['shipper']['city']
+
+Informations sur le destinataire :
+
+    ['shipment']['recipient']['type']
+    ['shipment']['recipient']['country']
+    ['shipment']['recipient']['zipcode']
+    ['shipment']['recipient']['city']
+
+Pour chaque offre dans ['shipment']['offer'] :
+
+    ['mode']
+    ['operator']['code']
+    ['operator']['label']
+    ['operator']['logo']
+    ['service']['code']
+    ['service']['label']
+    ['price']['currency']
+    ['price']['tax-exclusive']
+    ['price']['tax-inclusive']
+    ['characteristics']['label'] (tableau)
+    ['collection']['type']['code']
+    ['collection']['type']['label']
+    ['collection']['date']
+    ['collection']['label']
+    ['delivery']['type']['code']
+    ['delivery']['type']['label']
+    ['delivery']['date']
+    ['delivery']['time']
+    ['delivery']['label']
+
+Informations obligatoires (pour chaque paramètre dans ['mandatory_informations']['parameter']) :
+
+    ['code']
+    ['label']
+    ['type']
+
+Options (si présentes) :
+
+    ['options']['option']['code']
+    ['options']['option']['name']
+    Pour chaque paramètre dans ['options']['option']['parameter'] :
+        ['code']
+        ['label']
+        ['type']
+        
+        
+        
+        
+Informations sur l'expédition :
+['shipment']['content'] // Code du contenu selon le référentiel
+['shipment']['collection_date'] // Date de collecte au format YYYY-MM-DD
+Informations sur le(s) colis :
+['shipment']['package']['width'] // Largeur du colis
+['shipment']['package']['height'] // Hauteur du colis
+['shipment']['package']['length'] // Longueur du colis
+['shipment']['package']['weight'] // Poids du colis
+['shipment']['package']['quantity'] // Quantité de colis
+Informations sur l'expéditeur :
+['shipment']['shipper']['city'] // Ville de l'expéditeur
+['shipment']['shipper']['type'] // Type d'expéditeur (particulier ou entreprise)
+['shipment']['shipper']['country'] // Code ISO du pays de l'expéditeur
+['shipment']['shipper']['zipcode'] // Code postal de l'expéditeur
+Informations sur le destinataire :
+['shipment']['recipient']['city'] // Ville du destinataire
+['shipment']['recipient']['type'] // Type de destinataire (particulier ou entreprise)
+['shipment']['recipient']['country'] // Code ISO du pays du destinataire
+['shipment']['recipient']['zipcode'] // Code postal du destinataire
+Informations sur chaque offre (dans ['shipment']['offer']) :
+['price']['currency'] // Devise du prix (ex: EUR)
+['price']['tax-exclusive'] // Prix hors taxes
+['price']['tax-inclusive'] // Prix toutes taxes comprises
+['service']['code'] // Code de l'offre de service
+['service']['label'] // Libellé du service
+
+['operator']['code'] // Code du transporteur
+['operator']['logo'] // URL du logo du transporteur
+['operator']['label'] // Nom du transporteur
+['collection']['date'] // Date de dépôt ou de collecte
+
+modalité de dépôt ou collecte.
+['collection']['type']['code'] // Code du type de collecte (ex: DROPOFF_POINT, POST_OFFICE)
+['collection']['type']['label'] // Libellé du type de collecte
+['collection']['label'] // Description de la modalité de dépôt ou de collecte
+
+date de retrait ou de livraison au format YYYY-MM-DD, estimée en fonction de la date de collecte/dépôt prévue.
+['delivery']['date'] // Date estimée de livraison
+['delivery']['type']['code'] // Code du type de livraison (ex: PICKUP_POINT, HOME)
+['delivery']['type']['label'] // Libellé du type de livraison
+['delivery']['label'] // Description de la modalité de livraison
+['characteristics'] // Liste des caractéristiques de l'offre de service
+
+liste des paramètres obligatoires pour sélectionner cette offre de transport lors de la commande.
+['mandatory_information']['parameter']['code'] // Code du paramètre obligatoire
+['mandatory_information']['parameter']['label'] // Description du paramètre obligatoire
+['mandatory_information']['parameter']['type'] // Type de valeur attendue pour le paramètre obligatoire
+
+liste des options disponibles pour ce devis.
+['options']['option']['code'] // Code de l'option disponible
+['options']['option']['name'] // Nom de l'option disponible
+['options']['option']['parameter']['code'] // Code du paramètre de l'option
+['options']['option']['parameter']['label'] // Description du paramètre de l'option
+['options']['option']['parameter']['type'] // Type de valeur attendue pour le paramètre de l'option        

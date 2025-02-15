@@ -1,0 +1,48 @@
+{extends file="email-layout.tpl"}
+
+{$d='boxtalshipping.email.default'}
+
+{* Do not provide a "Open in browser" link  *}
+{block name="browser"}{/block}
+{* No pre-header *}
+{block name="pre-header"}{/block}
+
+{* Subject  *}
+{block name="email-subject"}{intl d=$d l="Your %ref order has been shipped" ref=$REF}{/block}
+
+{* Title  *}
+{block name="email-title"}{intl d=$d l="Your %ref order has been shipped" ref=$REF}{/block}
+
+{* Content  *}
+{block name="email-content"}
+{loop type="order" name="order" customer='*' id=$order_id}
+    {loop type="customer" name="customer.order" current=false id=$CUSTOMER backend_context=1}
+        <p>{intl d=$d l="Dear %first %last" last=$LASTNAME first=$FIRSTNAME},</p>
+    {/loop}
+
+    {$locale = 'FR'}
+    {loop type="lang" name="lang" id=$LANG limit=1}
+        {$locale = $LOCALE|substr:0:2|upper}
+    {/loop}
+    {* Récupérer les informations de livraison Boxtal *}
+    {loop type="boxtal.delivery.address" name="boxtal_delivery" order_id=$ID}
+        {$carrier_code = $CARRIER_CODE}
+    {/loop}
+    
+    {* Définir l'URL de tracking en fonction du transporteur *}
+    {if $carrier_code == 'MONR'}
+        {$tracking_url = "https://www.mondialrelay.fr/suivi-de-colis"}
+    {elseif $carrier_code == 'CHRP'}
+        {$tracking_url = "https://www.chronopost.fr/tracking-no-cms/suivi-page"}
+    {elseif $carrier_code == 'UPSE'}
+        {$tracking_url = "https://www.ups.com/track?loc=fr_FR&tracknum="}
+    {else}
+        {$tracking_url = "#"}
+    {/if}
+    
+    <p>{intl d=$d l="Your order %order_ref has just been shipped from our store. The tracking number for this order is %tracking_ref. Please <a href=\"%tracking_url\">click here</a> to track the delivery." tracking_ref=$DELIVERY_REF order_ref=$REF tracking_url=$tracking_url}</p>
+    <p>{intl d=$d l="Details about this order are available <a href=\"%account_url\">in your customer account</a>." account_url={url path="/account"}}</p>
+    <p>{intl d=$d l="See you soon at <a href=\"%url\">%store</a>" url={navigate to='index'} store={config key="store_name"}}</p>
+    <p>{intl d=$d l="The %store team." store={config key="store_name"}}</p>
+{/loop}
+{/block}
